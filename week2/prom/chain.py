@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from time import sleep
 from dotenv import load_dotenv
 from groq import Groq
 
@@ -12,7 +13,7 @@ if not my_api_key:
 
 client=Groq(api_key=my_api_key)
 
-model="qwen/qwen3-32b"
+model = "openai/gpt-oss-120b"
 
 JD="""
 Job Title: Senior Data Engineer
@@ -61,3 +62,71 @@ Junior Data Analyst | TechCorp (2021 – 2023)
 EDUCATION
 B.S. in Computer Science | University of Texas (2021)
 """
+def ask_llm(system_prompt, user_prompt):
+    sys_messsage={
+        "role":"system",
+        "content": system_prompt
+    }
+
+    user_message={
+        "role":"user",
+        "content": user_prompt
+    }
+
+    messages = [sys_messsage, user_message]
+    response = client.chat.completions.create(model=model, messages=messages)
+    answer = response.choices[0].message.content
+    return answer
+
+def resume_extract():
+    #extract skills from resume
+    system_prompt="""
+    YOU are a professional hr assistant. extract the skills from the candidates resume provided.
+    only return the skills no other things. do not invent things by yourself
+    give the answers sperated by commas only return true information and only reuturn skills
+    """
+
+    user_prompt=f"""
+    extract the skills from this resume
+    {RESUME}
+    """
+    return ask_llm(system_prompt, user_prompt)
+
+def jd_extract():
+    #extract skills from resume
+    system_prompt=f"""
+    YOU are a professional hr assistant. extract the skills from the job description provided.
+    only return the skills no other things. do not invent things by yourself
+    """
+
+    user_prompt=f"""
+    extract the skills from this JD
+    {JD}
+    """
+    return ask_llm(system_prompt, user_prompt)
+
+
+def match_skills(candidate, jd):
+    system_prompt="""
+    you are a professional hr assistant. compare skills of candidate and skills required in the jd and produce
+    final score between 1 and 100 and produce whether the candidate is a good fit for the role
+    """
+
+    user_prompt=f"""
+    TASK:compare and match the skills
+    JD:
+    {jd}
+    candidate:
+    {candidate}
+    output format: only mention crisp points dont give explanations
+    """
+
+    return ask_llm(system_prompt, user_prompt)
+
+candidate = resume_extract()
+print(candidate)
+sleep(2)
+jd = jd_extract()
+print(jd)
+score = match_skills(candidate, jd)
+print(score)

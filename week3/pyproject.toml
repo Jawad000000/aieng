@@ -1,0 +1,23 @@
+[project]
+name = "week3"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Mohd jawwad", email = "mohdjawwad73@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "groq>=1.7.0",
+    "numpy>=2.5.4",
+    "pydantic>=2.14.1",
+    "python-dotenv>=1.2.4",
+    "sentence-transformers>=6.1.0",
+]
+
+[project.scripts]
+week3 = "week3:main"
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
